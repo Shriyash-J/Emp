@@ -1,0 +1,6 @@
+cd frontend  
+npm run dev      
+
+
+cd backend-flask 
+python app.py

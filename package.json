@@ -1,0 +1,11 @@
+{
+  "name": "pacematic-corporate-ems",
+  "version": "1.0.0",
+  "description": "Pacematic Corporate Pvt. Ltd. - Employee Management System",
+  "scripts": {
+    "backend": "cd backend && npm start",
+    "frontend": "cd frontend && npm run dev",
+    "install-all": "cd backend && npm install && cd ../frontend && npm install",
+    "dev": "echo Starting both servers... && cd backend && npm start"
+  }
+}

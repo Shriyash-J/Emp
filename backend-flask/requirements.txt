@@ -1,0 +1,19 @@
+flask
+flask-cors
+flask-jwt-extended
+flask-sqlalchemy
+flask-mail
+flask-limiter
+bcrypt
+python-dotenv
+reportlab
+bleach
+numpy
+Pillow
+razorpay
+psycopg2-binary
+gunicorn
+# AWS SDK for Rekognition
+boto3
+# Lightweight OpenCV (no GUI, perfect for Render)
+opencv-python-headless
