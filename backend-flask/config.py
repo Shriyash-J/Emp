@@ -30,19 +30,18 @@ class Config:
     JWT_HEADER_TYPE = 'Bearer'
 
     # --- MAIL (Gmail SMTP) ---
+# --- MAIL CONFIG ---
     MAIL_SERVER = os.getenv('MAIL_SERVER', 'smtp.gmail.com')
-    # Force integer type for Port
-    MAIL_PORT = int(os.getenv('MAIL_PORT', 587))
-    # Robust boolean conversion for TLS/SSL
-    MAIL_USE_TLS = str(os.getenv('MAIL_USE_TLS', 'False')).lower() == 'true'
+    MAIL_PORT = int(os.getenv('MAIL_PORT', 465))
+    
+    # Use SSL for 465, TLS for 587. Never both.
     MAIL_USE_SSL = str(os.getenv('MAIL_USE_SSL', 'True')).lower() == 'true'
+    MAIL_USE_TLS = str(os.getenv('MAIL_USE_TLS', 'False')).lower() == 'true'
     
-    MAIL_USERNAME = os.getenv('MAIL_USERNAME', '')
-    
-    # CRITICAL FIX: Strip spaces from the App Password automatically
-    # This handles the "woyr imyo irsf blix" format from your screenshot
-    _raw_password = os.getenv('MAIL_PASSWORD', '')
-    MAIL_PASSWORD = _raw_password.replace(' ', '') if _raw_password else ''
+    MAIL_USERNAME = os.getenv('MAIL_USERNAME')
+    # Auto-strip spaces from App Password
+    _pw = os.getenv('MAIL_PASSWORD', '')
+    MAIL_PASSWORD = _pw.replace(' ', '') if _pw else ''
     
     MAIL_DEFAULT_SENDER = os.getenv('MAIL_DEFAULT_SENDER', MAIL_USERNAME)
 
