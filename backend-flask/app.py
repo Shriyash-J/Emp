@@ -182,22 +182,24 @@ def _migrate_user_upi_column():
 
 # --- INITIALIZATION AT MODULE LEVEL ---
 # This ensures it runs once when the master process starts
+# 1. Create the app instance at the top level
 app = create_app()
 
+# 2. Database & Seeding logic
+# On Vercel, this runs during the "Cold Start"
 with app.app_context():
-    db.create_all()
-    _migrate_db()
-    from seed import seed_database
-    seed_database()
+    try:
+        db.create_all()
+        _migrate_db()
+        from seed import seed_database
+        seed_database()
+        print("[SUCCESS] Database initialized and seeded.")
+    except Exception as e:
+        print(f"[ERROR] Database init failed: {e}")
 
+# 3. Vercel doesn't use the 'if __name__ == "__main__"' block for serving,
+# but we keep it here so you can still run it locally!
 if __name__ == '__main__':
-    # Dynamic port for Render compatibility
     port = int(os.environ.get("PORT", 5000))
     debug_mode = os.getenv('FLASK_DEBUG', 'False').lower() == 'true'
-    
-    print('\n========================================')
-    print('  Worknet HRMS - Backend Live')
-    print(f'  Port: {port} | Debug: {debug_mode}')
-    print('========================================\n')
-    
     app.run(host='0.0.0.0', port=port, debug=debug_mode)
