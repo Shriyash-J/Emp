@@ -1,6 +1,16 @@
 import axios from 'axios';
 
-const API = axios.create({ baseURL: '/api' });
+/**
+ * PRODUCTION SETUP:
+ * This uses the environment variable 'VITE_API_URL' defined in Vercel.
+ * If that variable is missing (like on your local machine), 
+ * it falls back to '/api' which uses your Vite proxy.
+ */
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
+
+const API = axios.create({ 
+  baseURL: API_BASE_URL 
+});
 
 API.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
