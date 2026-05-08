@@ -233,13 +233,23 @@ def _migrate_user_upi_column():
     conn.close()
 
 
+# 1. Create the app at the module level so Gunicorn can find it
+app = create_app()
+
 if __name__ == '__main__':
-    app = create_app()
+    # 2. Local execution logic
     debug_mode = os.getenv('FLASK_DEBUG', 'False').lower() == 'true'
+    
     print('\n========================================')
     print('  Aaryak Solution')
     print('  Flask Auth Server with JWT + OTP')
     print(f'  Debug: {debug_mode}')
-    print('  Running on http://localhost:5000')
+    
+    # Use the PORT environment variable for Render compatibility
+    port = int(os.environ.get("PORT", 5000))
+    print(f'  Running on http://0.0.0.0:{port}')
+    print('========================================\n')
+    
+    app.run(host='0.0.0.0', port=port, debug=debug_mode)
     print('========================================\n')
     app.run(host='0.0.0.0', port=5000, debug=debug_mode)
