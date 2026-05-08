@@ -1,3 +1,4 @@
+import os  # Added for environment variable check
 import random
 import string
 from datetime import datetime, timedelta, timezone
@@ -5,15 +6,12 @@ from flask import current_app
 from flask_mail import Message
 from models import OTP, db
 
-
 def generate_otp(length=6):
     """Generate a random numeric OTP."""
     return ''.join(random.choices(string.digits, k=length))
 
-
 def create_otp(email, purpose='login'):
     """Create and store a new OTP for the given email."""
-    # Invalidate any existing unused OTPs for this email and purpose
     OTP.query.filter_by(email=email, purpose=purpose, is_used=False).update({'is_used': True})
     db.session.commit()
 
@@ -31,9 +29,8 @@ def create_otp(email, purpose='login'):
 
     return otp_code
 
-
 def verify_otp(email, otp_code, purpose='login'):
-    """Verify the OTP for the given email. Returns (success, message)."""
+    """Verify the OTP for the given email."""
     otp_record = OTP.query.filter_by(
         email=email,
         purpose=purpose,
@@ -43,7 +40,6 @@ def verify_otp(email, otp_code, purpose='login'):
     if not otp_record:
         return False, 'No OTP found. Please request a new one.'
 
-    # Increment attempts
     otp_record.attempts += 1
     db.session.commit()
 
@@ -61,15 +57,23 @@ def verify_otp(email, otp_code, purpose='login'):
         remaining = 5 - otp_record.attempts
         return False, f'Invalid OTP. {remaining} attempts remaining.'
 
-    # OTP is valid — mark as used
     otp_record.is_used = True
     db.session.commit()
 
     return True, 'OTP verified successfully.'
 
-
 def send_otp_email(mail, email, otp_code, purpose='login'):
-    """Send OTP via Gmail SMTP."""
+    """Send OTP via Gmail SMTP or Fallback to Console on Network Error."""
+    
+    # 1. Check if we should explicitly bypass the email sending
+    bypass_otp = os.getenv('BYPASS_OTP', 'False').lower() == 'true'
+    
+    if bypass_otp:
+        print("\n" + "="*50)
+        print(f" [BYPASS MODE] OTP for {email}: {otp_code}")
+        print("="*50 + "\n")
+        return True, 'OTP generated (Bypass Mode).'
+
     purpose_text = {
         'login': 'Login Verification',
         'register': 'Account Registration',
@@ -136,12 +140,9 @@ def send_otp_email(mail, email, otp_code, purpose='login'):
 
     plain_body = f"""
     Aaryak Solution — {purpose_text}
-
     Your OTP Code: {otp_code}
-
     This code is valid for 5 minutes.
     Do not share this code with anyone.
-
     © 2026 Aaryak Solution
     """
 
@@ -155,5 +156,11 @@ def send_otp_email(mail, email, otp_code, purpose='login'):
         mail.send(msg)
         return True, 'OTP sent successfully.'
     except Exception as e:
-        print(f'[EMAIL ERROR] Failed to send OTP to {email}: {str(e)}')
-        return False, f'Failed to send email: {str(e)}'
+        # 2. EMERGENCY FALLBACK: Print to logs so you can still log in!
+        print("\n" + "!"*50)
+        print(f" [EMAIL FAILED] OTP for {email}: {otp_code}")
+        print(f" ERROR: {str(e)}")
+        print("!"*50 + "\n")
+        
+        # Return True so the frontend allows the user to try entering the code
+        return True, 'Mail delivery failed, but OTP is available in logs.'
