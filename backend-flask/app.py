@@ -79,25 +79,26 @@ def create_app():
 
     init_mail(mail)
 
-    app.register_blueprint(auth_bp)
-    app.register_blueprint(emp_bp)
-    app.register_blueprint(activity_bp)
-    app.register_blueprint(attendance_bp)
-    app.register_blueprint(leaves_bp)
-    app.register_blueprint(tasks_bp)
-    app.register_blueprint(announcements_bp)
-    app.register_blueprint(chat_bp)
-    app.register_blueprint(payroll_bp)
-    app.register_blueprint(letters_bp)
-    app.register_blueprint(recruitment_bp)
-    app.register_blueprint(performance_bp)
-    app.register_blueprint(exit_bp)
-    app.register_blueprint(teams_bp)
-    app.register_blueprint(admin_bp)
-    app.register_blueprint(face_attendance_bp)
-    app.register_blueprint(analytics_bp)
-    app.register_blueprint(messaging_bp)
-    app.register_blueprint(notifications_bp)
+# Register blueprints with the /api prefix to match your frontend baseURL
+    app.register_blueprint(auth_bp, url_prefix='/api')
+    app.register_blueprint(emp_bp, url_prefix='/api')
+    app.register_blueprint(activity_bp, url_prefix='/api')
+    app.register_blueprint(attendance_bp, url_prefix='/api')
+    app.register_blueprint(leaves_bp, url_prefix='/api')
+    app.register_blueprint(tasks_bp, url_prefix='/api')
+    app.register_blueprint(announcements_bp, url_prefix='/api')
+    app.register_blueprint(chat_bp, url_prefix='/api')
+    app.register_blueprint(payroll_bp, url_prefix='/api')
+    app.register_blueprint(letters_bp, url_prefix='/api')
+    app.register_blueprint(recruitment_bp, url_prefix='/api')
+    app.register_blueprint(performance_bp, url_prefix='/api')
+    app.register_blueprint(exit_bp, url_prefix='/api')
+    app.register_blueprint(teams_bp, url_prefix='/api')
+    app.register_blueprint(admin_bp, url_prefix='/api')
+    app.register_blueprint(face_attendance_bp, url_prefix='/api')
+    app.register_blueprint(analytics_bp, url_prefix='/api')
+    app.register_blueprint(messaging_bp, url_prefix='/api')
+    app.register_blueprint(notifications_bp, url_prefix='/api')
 
     # Rate limits for sensitive auth endpoints (applied per-route in routes_auth.py)
     # Blueprint-level limit removed — too aggressive with CORS preflight requests
@@ -234,11 +235,14 @@ def _migrate_user_upi_column():
 
 
 # 1. Create the app at the module level so Gunicorn can find it
+# Create the app instance here so Gunicorn can find it
 app = create_app()
 
 if __name__ == '__main__':
-    # 2. Local execution logic
     debug_mode = os.getenv('FLASK_DEBUG', 'False').lower() == 'true'
+    # Use the PORT environment variable provided by Render
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port, debug=debug_mode)
     
     print('\n========================================')
     print('  Aaryak Solution')
