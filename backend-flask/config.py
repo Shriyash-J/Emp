@@ -34,8 +34,8 @@ class Config:
     # Force integer type for Port
     MAIL_PORT = int(os.getenv('MAIL_PORT', 587))
     # Robust boolean conversion for TLS/SSL
-    MAIL_USE_TLS = str(os.getenv('MAIL_USE_TLS', 'True')).lower() == 'true'
-    MAIL_USE_SSL = str(os.getenv('MAIL_USE_SSL', 'False')).lower() == 'true'
+    MAIL_USE_TLS = str(os.getenv('MAIL_USE_TLS', 'False')).lower() == 'true'
+    MAIL_USE_SSL = str(os.getenv('MAIL_USE_SSL', 'True')).lower() == 'true'
     
     MAIL_USERNAME = os.getenv('MAIL_USERNAME', '')
     
