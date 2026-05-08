@@ -37,3 +37,7 @@ class Config:
 
     # OTP
     OTP_EXPIRY_MINUTES = int(os.getenv('OTP_EXPIRY_MINUTES', 5))
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        "pool_pre_ping": True,
+        "pool_recycle": 280, # Resets connections before Render's 300s timeout
+    }
